@@ -32,6 +32,7 @@ import coil3.request.CachePolicy
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import com.kyant.fishnet.Fishnet
+import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.context.refreshContext
 import com.movtery.zalithlauncher.coroutine.TaskSystem
@@ -39,11 +40,14 @@ import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.path.GamePathManager
 import com.movtery.zalithlauncher.keepalive.TaskKeepAlive
 import com.movtery.zalithlauncher.path.PathManager
+import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.loadAllSettings
 import com.movtery.zalithlauncher.ui.activities.showFatalError
 import com.movtery.zalithlauncher.ui.activities.showLauncherCrash
 import com.movtery.zalithlauncher.utils.device.Architecture
 import com.movtery.zalithlauncher.utils.logging.Logger
+import com.movtery.zalithlauncher.utils.logging.LoggerConfig
+import com.movtery.zalithlauncher.utils.printLauncherInfo
 import com.movtery.zalithlauncher.utils.writeCrashFile
 import com.tencent.mmkv.MMKV
 import dagger.hilt.android.HiltAndroidApp
@@ -90,7 +94,15 @@ class ZLApplication : Application(), SingletonImageLoader.Factory {
             MMKV.initialize(this)
             loadAllSettings(this)
 
-            Logger.initialize(this)
+            Logger.initialize(
+                this,
+                LoggerConfig(
+                    logsDir = PathManager.DIR_LAUNCHER_LOGS,
+                    retentionDays = { AllSettings.launcherLogRetentionDays.getValue() },
+                    banner = BuildKeys.LAUNCHER_IDENTIFIER,
+                    printEnvironmentInfo = ::printLauncherInfo
+                )
+            )
 
             initializeData()
             PathManager.DIR_FILES_PRIVATE = getDir("files", MODE_PRIVATE)

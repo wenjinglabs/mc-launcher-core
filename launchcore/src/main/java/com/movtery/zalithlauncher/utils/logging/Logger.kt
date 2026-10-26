@@ -20,11 +20,7 @@ package com.movtery.zalithlauncher.utils.logging
 
 import android.content.Context
 import android.util.Log
-import com.movtery.zalithlauncher.BuildKeys
-import com.movtery.zalithlauncher.path.PathManager
-import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.utils.file.zipDirectory
-import com.movtery.zalithlauncher.utils.printLauncherInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,6 +40,9 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  * [Modified from HMCL](https://github.com/HMCL-dev/HMCL/blob/57018bef47417108b75e2298ab61f89a7586b1b9/HMCLCore/src/main/java/org/jackhuang/hmcl/util/logging/Logger.java)
+ *
+ * M1 迁移注记：日志目录、保留天数、横幅与环境信息改为 [LoggerConfig] 注入，
+ * 核心库不再依赖 PathManager / AllSettings / BuildKeys。
  */
 object Logger : CoroutineScope {
     override val coroutineContext: CoroutineContext = Dispatchers.Default + Job()
@@ -54,11 +53,12 @@ object Logger : CoroutineScope {
      * 当前进程的标识
      */
     private lateinit var PROCESS_TAG: String
+    private lateinit var config: LoggerConfig
     private val isInitialized = AtomicBoolean(false)
     private val channel = Channel<LogMessage>(Channel.UNLIMITED)
 
     private val logRetentionDays: Int
-        get() = AllSettings.launcherLogRetentionDays.getValue()
+        get() = config.retentionDays()
 
     private var currentLogFile: File? = null
     private var logWriter: PrintWriter? = null
@@ -67,9 +67,10 @@ object Logger : CoroutineScope {
     /**
      * 初始化日志
      */
-    fun initialize(context: Context) {
+    fun initialize(context: Context, config: LoggerConfig) {
         PACKAGE_PREFIX = "${context.packageName}."
         PROCESS_TAG = getProcessTag(context)
+        this.config = config
 
         if (!isInitialized.compareAndSet(false, true)) return
 
@@ -80,7 +81,7 @@ object Logger : CoroutineScope {
             //所以清理旧的日志的工作需要放到初始化阶段
             deleteOldLogs()
 
-            printLauncherInfo()
+            printStartupBanner()
 
             processEvents()
         }
@@ -95,11 +96,11 @@ object Logger : CoroutineScope {
         return if (separatorIndex < 0) "main" else processName.substring(separatorIndex + 1)
     }
 
-    private suspend fun printLauncherInfo() {
+    private suspend fun printStartupBanner() {
         logWriter?.apply {
             withContext(Dispatchers.IO) {
-                println("================ ${BuildKeys.LAUNCHER_IDENTIFIER} Log ================")
-                printLauncherInfo { println(it) }
+                println("================ ${config.banner} Log ================")
+                config.printEnvironmentInfo { println(it) }
                 println("====================================================")
                 flush()
             }
@@ -130,7 +131,7 @@ object Logger : CoroutineScope {
 
         do {
             val suffix = if (counter == 0) "" else ".$counter"
-            file = File(PathManager.DIR_LAUNCHER_LOGS, "log_${dateFormat.format(Date())}_$PROCESS_TAG$suffix.log")
+            file = File(config.logsDir, "log_${dateFormat.format(Date())}_$PROCESS_TAG$suffix.log")
             counter++
         } while (!file.createNewFile())
 
@@ -194,7 +195,7 @@ object Logger : CoroutineScope {
     }
 
     private suspend fun deleteOldLogs() = withContext(Dispatchers.IO) {
-        PathManager.DIR_LAUNCHER_LOGS.listFiles()?.let { files ->
+        config.logsDir.listFiles()?.let { files ->
             val cutoff = System.currentTimeMillis() - logRetentionDays * 86400000L
             //清理遗留的 0kb 空日志
             val emptyLogCutoff = System.currentTimeMillis() - 60 * 1000L
@@ -244,7 +245,7 @@ object Logger : CoroutineScope {
     suspend fun pack(target: File) {
         withContext(Dispatchers.IO) {
             zipDirectory(
-                sourceDir = PathManager.DIR_LAUNCHER_LOGS,
+                sourceDir = config.logsDir,
                 outputZipFile = target
             )
         }

@@ -32,16 +32,16 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 | 构件 | 内容 | AAR 体积目标 |
 |---|---|---|
 | `:launchcore` | 版本下载/安装、启动、账号、日志、runtime pack 管理、JNI 胶水 | **< 10MB** |
-| `:launchcore-compose` | `MinecraftSurface`（Surface + 输入管线）、最小参考 UI（安装/登录页） | 小 |
+| `:launchcore-compose` | **组件库（一等公民交付物）**：`MinecraftSurface`（含默认虚拟按键层）、安装进度、版本选择、账号登录、启动按钮、崩溃面板、日志查看器等开箱组件 + 整页模板；底座优先复用仓库内 Terracotta/InputMap/LayerController | 中 |
 | runtime packs | JRE 8/17/21/25、ANGLE/gl4es/Zink、LWJGL 3.3/3.4、AWT 适配 —— **不进 AAR**，按需下载 | 外部托管 |
-| `:sample` | get-started 示例 App（≈100 行） | — |
+| `:sample` | get-started 示例 App（目标 ≈30 行，靠组件层达成） | — |
 | reference-app | 原 Zalith2 UI 重建在 core 上 = API 验收 + 回归基线 | — |
 
 ## 里程碑
 
 - [x] **M0**（本阶段）：硬 fork 2.7.2、`:launchcore` 模块 + API 草案、纯净度门禁、PROJECT.md
 - [ ] **M1**：边界重构——按包映射搬家、解开 Compose/Toast/Activity 依赖、门禁脚本持续绿灯（本地执行）。交付：App 功能不变，core 无 Android UI 依赖
-- [ ] **M2**：对外 0.1（JitPack）——`MinecraftSurface` + `LaunchHandle`、sample 离线启动 arm64、get-started 文档
+- [ ] **M2**：对外 0.1（JitPack）——`MinecraftSurface` + 组件库第一组（安装进度/账号登录/启动按钮/崩溃面板）、sample 离线启动 arm64（≈30 行）、get-started 文档
 - [ ] **M3**：0.2——runtime packs 按需下载上线（AAR 瘦身达标）、微软登录、渲染器切换
 - [ ] **M4**：1.0——mod loader 安装、reference-app 验收、迁 Maven Central、锁 API
 

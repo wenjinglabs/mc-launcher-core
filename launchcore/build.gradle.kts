@@ -36,6 +36,7 @@ kotlin {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.commons.io)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 }

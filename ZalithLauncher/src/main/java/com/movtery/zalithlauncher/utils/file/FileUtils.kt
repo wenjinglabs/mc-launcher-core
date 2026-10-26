@@ -418,36 +418,6 @@ fun ZipFile.extractEntryToFile(entry: ZipEntry, outputFile: File) {
 }
 
 /**
- * 压缩指定目录内的文件到压缩包
- * @param outputZipFile 指定压缩包
- * @param preserveFileTime 是否保留原始文件的修改时间
- */
-suspend fun zipDirectory(
-    sourceDir: File,
-    outputZipFile: File,
-    preserveFileTime: Boolean = true
-) = withContext(Dispatchers.IO) {
-    if (!sourceDir.exists() || !sourceDir.isDirectory) {
-        throw IllegalArgumentException("Source path must be an existing directory")
-    }
-
-    ZipOutputStream(FileOutputStream(outputZipFile)).use { zipOut ->
-        sourceDir.walkTopDown().filter { it.isFile }.forEach { file ->
-            val entryName = file.relativeTo(sourceDir).path.replace("\\", "/")
-            val zipEntry = ZipEntry(entryName)
-            if (preserveFileTime) {
-                zipEntry.time = file.lastModified()
-            }
-            zipOut.putNextEntry(zipEntry)
-            file.inputStream().use { input ->
-                input.copyTo(zipOut)
-            }
-            zipOut.closeEntry()
-        }
-    }
-}
-
-/**
  * 复制目录下的所有内容到目标目录
  */
 suspend fun copyDirectoryContents(
