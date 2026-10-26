@@ -39,8 +39,8 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 
 ## 里程碑
 
-- [x] **M0**（本阶段）：硬 fork 2.7.2、`:launchcore` 模块 + API 草案、CI + 纯净度门禁、PROJECT.md
-- [ ] **M1**：边界重构——按包映射搬家、解开 Compose/Toast/Activity 依赖、CI 门禁持续绿灯。交付：App 功能不变，core 无 Android UI 依赖
+- [x] **M0**（本阶段）：硬 fork 2.7.2、`:launchcore` 模块 + API 草案、纯净度门禁、PROJECT.md
+- [ ] **M1**：边界重构——按包映射搬家、解开 Compose/Toast/Activity 依赖、门禁脚本持续绿灯（本地执行）。交付：App 功能不变，core 无 Android UI 依赖
 - [ ] **M2**：对外 0.1（JitPack）——`MinecraftSurface` + `LaunchHandle`、sample 离线启动 arm64、get-started 文档
 - [ ] **M3**：0.2——runtime packs 按需下载上线（AAR 瘦身达标）、微软登录、渲染器切换
 - [ ] **M4**：1.0——mod loader 安装、reference-app 验收、迁 Maven Central、锁 API
@@ -63,6 +63,8 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 
 **ADR-8 ABI 策略**。v1 锁 arm64-v8a（基线现状），32 位/x86 是 1.0 后的扩展项——每加一个 ABI，packs/测试矩阵/构建全翻倍。
 
+**ADR-9 不使用 GitHub Actions**（2026-10-27 维护者决策）。所有验证本地执行：门禁脚本 + 单测每次改动必跑；插桩/E2E 用本地无头模拟器或真机。代价是仓库无 CI badge、纯靠本地纪律；如未来需要再重新评估。
+
 ## 测试策略（headless 优先）
 
 | 层 | 覆盖 | 工具 | 模拟器 |
@@ -73,7 +75,7 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 | 4 E2E 启动 | MC 真的跑到主循环 | 日志断言：`LWJGL version` → `Setting user:` → 90s 无 FATAL | 同上 |
 
 - **golden-file**：启动参数/classpath 输出与录制基线逐字段比对，不启动游戏即可抓回归
-- **CI 分层**：PR 只跑 1+2 层；nightly/发版在 GitHub Actions（Linux runner 自带 KVM）跑 3+4
+- **执行位置**（ADR-9）：1、2 层本地随时跑；3、4 层本地无头模拟器或真机 adb
 - 判定"启动成功"= 结构化日志事实，不依赖画面/截图
 
 ## 包 → 模块迁移映射（M1 执行）
