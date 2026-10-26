@@ -44,6 +44,11 @@ private const val TAG = "AccountManager"
 object AccountsManager {
     private val scope = CoroutineScope(Dispatchers.IO)
 
+    init {
+        //实体反向依赖管理器的环由钩子解开（核心库方向）
+        WardrobeHooks.refreshWardrobe = { refreshWardrobe() }
+    }
+
     //账号相关
     private val _accounts = CopyOnWriteArrayList<Account>()
     private val _accountsFlow = MutableStateFlow<List<Account>>(emptyList())

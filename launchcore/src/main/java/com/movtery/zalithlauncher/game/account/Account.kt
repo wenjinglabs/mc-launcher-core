@@ -84,7 +84,7 @@ data class Account(
             val skinJob = async { updateSkin(url) }
             val capeJob = async { updateCape(url) }
             joinAll(skinJob, capeJob)
-            if (refresh) AccountsManager.refreshWardrobe()
+            if (refresh) WardrobeHooks.refreshWardrobe?.invoke()
         }
     }
 

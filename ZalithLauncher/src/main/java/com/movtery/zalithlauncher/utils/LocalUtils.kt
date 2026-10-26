@@ -56,7 +56,7 @@ import kotlin.math.floor
 
 private const val TAG = "LocalUtils"
 
-val GSON = GsonBuilder().setPrettyPrinting().create()
+//GSON 已迁移至核心库（utils/GSON.kt），FQCN 不变
 
 const val DEFAULT_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss"
 

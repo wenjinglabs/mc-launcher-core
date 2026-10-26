@@ -2,7 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.ksp.plugin)
     id("kotlinx-serialization")
+    id("kotlin-parcelize")
     // 注意：本模块禁止引入 compose 插件与任何 Android UI 依赖，见 scripts/gate_core_purity.sh
 }
 
@@ -42,7 +44,11 @@ dependencies {
     implementation(libs.commons.compress)
     implementation(libs.okio)
     implementation(libs.okhttp)
+    implementation(libs.gson)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.maven.artifact)
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
