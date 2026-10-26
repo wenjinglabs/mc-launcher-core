@@ -65,6 +65,12 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 
 **ADR-9 不使用 GitHub Actions**（2026-10-27 维护者决策）。所有验证本地执行：门禁脚本 + 单测每次改动必跑；插桩/E2E 用本地无头模拟器或真机。代价是仓库无 CI badge、纯靠本地纪律；如未来需要再重新评估。
 
+**ADR-10 包名与发布坐标解耦**（2026-10-27 维护者决策）。API 包名固定 `io.launchcore.core`，不随 GitHub 账号（曾用名 LanHuangJG → wenjinglabs）变化；M4 发布 Maven Central 时 group id 使用 Central Portal 已验证的 namespace，包名与 group id 无需一致。内部搬运代码保持 `com.movtery.zalithlauncher.*` 原 FQCN（见 MIGRATION.md），API 收口在 1.0 前单独处理。
+
+**ADR-11 微软登录 Client ID 由宿主注入**（2026-10-27 维护者决策）。库不内置任何 OAuth Client ID，也不复用上游 MovTery 的注册；宿主注册自己的 Azure 应用，经 `LaunchCoreConfig.microsoftClientId` 传入，未配置时 `Auth.microsoft` 抛 IllegalStateException。离线登录零依赖，get-started 不受影响。
+
+**ADR-12 runtime packs 托管**（2026-10-27 维护者决策）。权威源挂 wenjinglabs 个人 GitHub Releases；国内镜像（Cloudflare R2）M3 落地时开通；游戏本体文件继续走 BMCLAPI。
+
 ## 测试策略（headless 优先）
 
 | 层 | 覆盖 | 工具 | 模拟器 |
@@ -91,4 +97,4 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 
 - Gradle 9.5.0 / AGP 9.3.0 / Kotlin 2.4.20 / compileSdk 37 / minSdk 26 / JVM target 11
 - 常用命令：`./gradlew :launchcore:assembleRelease :launchcore:test`；门禁 `bash scripts/gate_core_purity.sh`
-- API 草案位于 `launchcore/src/main/java/io/launchcore/core/`（包名 `io.launchcore.core`，发布命名空间定案后再统一替换）
+- API 草案位于 `launchcore/src/main/java/io/launchcore/core/`（包名固定 `io.launchcore.core`，见 ADR-10）

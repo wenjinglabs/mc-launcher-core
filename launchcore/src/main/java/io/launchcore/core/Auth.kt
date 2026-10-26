@@ -13,6 +13,10 @@ interface Auth {
     /**
      * Runs the Microsoft device/web login flow.
      *
+     * Requires [LaunchCoreConfig.microsoftClientId] to be set on the core
+     * instance (ADR-11: the library never ships its own OAuth client);
+     * throws [IllegalStateException] when it is missing.
+     *
      * @param context an activity context (the core may need to start an intent).
      */
     suspend fun microsoft(context: Context): Account.Microsoft

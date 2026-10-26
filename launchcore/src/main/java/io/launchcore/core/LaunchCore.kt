@@ -33,7 +33,7 @@ interface LaunchCore {
          * (see PROJECT.md milestones). Placeholder until then.
          */
         @JvmStatic
-        fun create(context: Context): LaunchCore =
+        fun create(context: Context, config: LaunchCoreConfig = LaunchCoreConfig()): LaunchCore =
             throw NotImplementedError(
                 "LaunchCore implementation is wired up in milestone M2; " +
                     "see PROJECT.md for the roadmap."
