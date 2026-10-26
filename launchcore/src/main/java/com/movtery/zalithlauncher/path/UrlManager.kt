@@ -18,8 +18,6 @@
 
 package com.movtery.zalithlauncher.path
 
-import com.movtery.zalithlauncher.BuildConfig
-import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.utils.network.ResilientDns
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -39,30 +37,19 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import java.util.concurrent.TimeUnit
 
-val URL_USER_AGENT: String = "${BuildKeys.LAUNCHER_SHORT_NAME}/Android_${BuildConfig.VERSION_NAME}"
+/**
+ * M1 迁移注记：UA 与 CurseForge Key 改为 [NetIdentity] 注入；Zalith2 品牌 URL
+ * （项目主页/捐赠/插件源等）拆回 App 层的 path/AppUrls.kt，核心库保持品牌中立。
+ */
+val URL_USER_AGENT: String get() = NetIdentity.userAgent
 val TIME_OUT = TimeUnit.SECONDS.toMillis(30L)
 
 const val HOST_CURSEFORGE_API = "api.curseforge.com"
 const val CURSEFORGE_CDN_SUFFIX = "forgecdn.net"
 
-const val URL_MCMOD: String = "https://www.mcmod.cn/"
+// Mojang 官方协议端点（版本/资产下载属于核心库职责）
 const val URL_MINECRAFT_VERSION_REPOS: String = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 const val URL_MINECRAFT_ASSETS_INDEX: String = "https://launchermeta.mojang.com/v1/packages"
-const val URL_MINECRAFT_PURCHASE = "https://www.xbox.com/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj"
-const val URL_PROJECT: String = "https://github.com/ZalithLauncher/ZalithLauncher2"
-const val URL_PROJECT_INFO: String = "https://api.github.com/repos/ZalithLauncher/Zalith-Info/contents/v2"
-const val URL_COMMUNITY: String = "https://github.com/ZalithLauncher/ZalithLauncher2/graphs/contributors"
-const val URL_WEBLATE: String = "https://hosted.weblate.org/projects/zalithlauncher2"
-const val URL_SUPPORT: String = "https://ifdian.net/a/MovTery"
-const val URL_EASYTIER: String = "https://easytier.cn/"
-
-const val URL_GITHUB_RENDERER_PLUGINS = "https://github.com/ShirosakiMio/FCLRendererPlugin/releases/tag/Renderer"
-const val URL_GITHUB_DRIVER_PLUGINS = "https://github.com/FCL-Team/FCLDriverPlugin/releases/tag/Turnip"
-const val URL_GITHUB_NATIVE_LIB_PLUGINS = "https://github.com/ZalithLauncher/NativeLibPlugin/releases"
-
-const val URL_CLOUD_RENDERER_PLUGINS = "https://www.123865.com/s/YLIUVv-hae0v"
-const val URL_CLOUD_DRIVE_DRIVER_PLUGINS = "https://www.123865.com/s/YLIUVv-3ae0v"
-const val URL_CLOUD_NATIVE_LIB_PLUGINS = "https://www.123865.com/s/YLIUVv-Hae0v"
 
 private fun isCurseForgeHost(host: String): Boolean =
     host == HOST_CURSEFORGE_API ||
@@ -78,7 +65,7 @@ private fun isCurseForgeHost(host: String): Boolean =
 private val CURSEFORGE_INTERCEPTOR = Interceptor { chain ->
     val request = chain.request()
     if (isCurseForgeHost(request.url.host)) {
-        val apiKey = BuildKeys.CURSEFORGE_API
+        val apiKey = NetIdentity.curseforgeApiKey()
         if (apiKey.isNotBlank()) {
             val newRequest = request.newBuilder()
                 .header("x-api-key", apiKey)
@@ -132,7 +119,7 @@ val GLOBAL_CLIENT = HttpClient(OkHttp) {
 }.apply {
     requestPipeline.intercept(HttpRequestPipeline.State) {
         if (isCurseForgeHost(context.url.host)) {
-            val apiKey = BuildKeys.CURSEFORGE_API
+            val apiKey = NetIdentity.curseforgeApiKey()
             if (apiKey.isNotBlank()) {
                 context.header("x-api-key", apiKey)
             }

@@ -27,10 +27,11 @@
 
 ## 波次进度
 
-- ✅ **W1a（本次）**：`utils/logging` 内核（Level / LogMessage / Logger + 新增 **LoggerConfig**：日志目录、保留天数、横幅、环境信息全部改为宿主注入，解耦 BuildKeys/PathManager/AllSettings/printLauncherInfo）；`zipDirectory` 从 FileUtils 抽出（纯 JDK 实现，App 内其余调用方经依赖解析无缝衔接）；`provider/FolderProvider.java`。
-- ⬜ **W1b**：context / contract / coroutine / crashlogs / database / keepalive / library / path / components + utils 纯净子集（Logger 已解耦后，utils.network/logging 依赖链可成批搬运）。
-- ⬜ **W2**：setting、utils 混合部分、bridge（JNI 胶水收口 facade）。
-- ⬜ **W3**：filemanager、game（大头）。
+- ✅ **W1a**：`utils/logging` 内核（Level / LogMessage / Logger + 新增 **LoggerConfig**：日志目录、保留天数、横幅、环境信息全部改为宿主注入，解耦 BuildKeys/PathManager/AllSettings/printLauncherInfo）；`zipDirectory` 从 FileUtils 抽出；`provider/FolderProvider.java`。
+- ✅ **W1b-批次一**：**path 包整体**（PathManager/LibPath/LogName + UrlManager 重构）+ **网络三件**（NetWorks/ResilientDns/RegionRestriction）+ **file/string 工具**（FileUtils/zip 适配器家族/InvalidFilenameException/UnpackZipException/_CompareString/StringUtils/ShiftDirection）+ 新增 **NetIdentity**（UA/CurseForge key 宿主注入）与 `isInterruptedIOException`、`isChinaMainland` 抽取。**Zalith2 品牌 URL（14 个常量）拆回 App 层 path/AppUrls.kt，core 保持品牌中立**。launchcore 新增依赖：ktor(client/content-negotiation/serialization)、okhttp、okio、commons-codec/compress、maven-artifact、androidx-core；启用 kotlinx-serialization 插件。
+- ⬜ **W1b-批次二（待做）**：coroutine 子集（Task/TaskLogOutput/TitledTask 需解 ui 依赖）、crashlogs、context、components（解 R）、keepalive（解 R）、utils/image+video+device 子集（需 coil）。
+- ⬜ **W2**：setting、utils 混合部分（LocalUtils/NetWorkUtils）、bridge（JNI 胶水收口 facade）、contract。
+- ⬜ **W3**：filemanager、game（大头）、database（依赖 game.account，随 W3）。
 
 ## 环境备忘（本机）
 

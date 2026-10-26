@@ -39,6 +39,7 @@ import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.path.GamePathManager
 import com.movtery.zalithlauncher.keepalive.TaskKeepAlive
+import com.movtery.zalithlauncher.path.NetIdentity
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.loadAllSettings
@@ -93,6 +94,9 @@ class ZLApplication : Application(), SingletonImageLoader.Factory {
 
             MMKV.initialize(this)
             loadAllSettings(this)
+
+            NetIdentity.userAgent = "${BuildKeys.LAUNCHER_SHORT_NAME}/Android_${BuildConfig.VERSION_NAME}"
+            NetIdentity.curseforgeApiKey = { BuildKeys.CURSEFORGE_API }
 
             Logger.initialize(
                 this,

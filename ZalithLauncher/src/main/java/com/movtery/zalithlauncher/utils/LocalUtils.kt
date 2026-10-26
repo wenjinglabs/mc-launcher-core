@@ -392,26 +392,6 @@ private fun formatWithUnit(value: Double, unit: String): String {
     return "$displayValue$unit"
 }
 
-fun isChinaMainland(): Boolean {
-    val timeZone = TimeZone.getDefault()
-
-    if (
-        timeZone.id in listOf(
-            "Asia/Shanghai",
-            "Asia/Chongqing",//历史遗留
-            "Asia/Urumqi"
-        )
-    ) return true
-
-    val offsetMillis = timeZone.getOffset(System.currentTimeMillis())
-    val isUtcPlus8 = offsetMillis == 8 * 60 * 60 * 1000
-
-    if (!isUtcPlus8) return false
-
-    //应用内支持修改语言，不能再以语言来进行判断
-    return /*Locale.getDefault().country.equals("CN", ignoreCase = true)*/false
-}
-
 /**
  * 检查当前环境是否为中文环境
  */

@@ -276,10 +276,3 @@ fun Activity.openLinkInternal(link: String, dataType: String? = null) {
         Logger.warning(TAG, "Failed to open link: $link", e)
     }
 }
-
-/**
- * 检查是不是单纯的中断异常，而不是网络超时导致的中断
- */
-fun Throwable.isInterruptedIOException(): Boolean {
-    return this is InterruptedIOException && this !is SocketTimeoutException
-}

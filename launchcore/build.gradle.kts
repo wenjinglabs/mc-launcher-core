@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
+    id("kotlinx-serialization")
     // 注意：本模块禁止引入 compose 插件与任何 Android UI 依赖，见 scripts/gate_core_purity.sh
 }
 
@@ -37,6 +38,16 @@ kotlin {
 dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.commons.io)
+    implementation(libs.commons.codec)
+    implementation(libs.commons.compress)
+    implementation(libs.okio)
+    implementation(libs.okhttp)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.maven.artifact)
+    implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 }
