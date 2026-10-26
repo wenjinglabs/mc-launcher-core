@@ -37,8 +37,10 @@
 - ✅ **W2a**：**AndroidStringText 拆分**——模型（非 sealed 接口 + Text/StringRes/Appended + 工厂/DSL）进 core（FQCN 不变，宿主可扩展变体）；App 层保留渲染器/富文本变体 `AnnotatedText`/`toAndroidString`（ui/AndroidStringTextCompose.kt）。**coroutine 任务引擎全套五件**（Task/TitledTask/TaskLogOutput/TaskSystem/TaskFlowExecutor）进 core。**TaskKeepAlive** 进 core（前台 Service 经 `serviceIntentProvider` 注入，Service 留 App）。
 - ⛔ **W2b 改道（审计否决原方案）**：setting 包**留 App**——审计发现 `AbstractSettingUnit.state` 用 compose runtime（`mutableStateOf`），全库 284 处 UI 直接读 `.state` 重组；8 个枚举带 R 字符串；AllSettings 满身 game/ui 依赖。它是"App 的 UI 设置目录"而非干净持久化设施。**MMKV 不进 core**（core 当前零设置消费）；W3 game 包搬入时用注入式配置接口承接其 AllSettings 读取，届时再按事实评估持久化后端。
 - ✅ **W2c（提前完成）**：**bridge JNI 面收口**——ZLBridge.java / NativeLibraryLoader.java / LoggerBridge.java / FliteTts.kt 进 core（FQCN 不变，JNI 符号绑定不受影响）。留 App：ZLBridgeStates（compose PointerIcon）、ZLNativeInvoker（Activity+启动编排 UI 胶水，M2 做 LaunchCore 实现时抽纯启动路径）。**注意：.so 仍由 App 模块构建**（externalNativeBuild 在 App），core 侧 native 打包（launchcore-native 构件）是 M3 工作——下游单独依赖 core 时缺 .so，M3 解决。
+- ✅ **W3-1**：**database 进 core**（Room 决策落地：3 表/浅 CRUD/两消费方全在 core，room-runtime 无 native）+ ksp/kotlin-parcelize 接线。**game/download/engine 全套 7 件**（分块/换源/重试下载引擎——M2 核心）。**renderer 全套 9 件**。**account 持久化集群**（Account 实体/Dao/Type/异常、auth_server.data、wardrobe 下载器×5）。**path 实体**（GamePath/GamePathDao）。抽取（FQCN 不变）：GSON、BitmapExt、DownloadHelpers（downloadFile/fetchString/withSpeedReport 族）。`WardrobeHooks` 钩子解开 Account 实体→AccountsManager 反向依赖（App init 注入）。
+- ⬜ **W3-2（待做）**：**AllSettings 注入接口**（23 项/16 文件）→ 解锁 account 其余/addons/path manager/sdl/multirt/plugin/support。
+- ⬜ **W3-3（待做）**：R→core 资源迁移 + download（26 脏）/version（17 脏）/launch（9 脏）重脏区；keycodes/input 因 MCOptions→Version 推迟至此；**filemanager 整体留 App**（零反向依赖，自带 UI 的文件浏览器功能）。
 - 留 App 不搬：library（R+BuildKeys）、CopyLabels（BuildKeys）、utils/image+video（死代码）、VulkanCapabilities（UI 调用方）、setting 整包（见上）、contract（ActivityResultContract 纯 UI）。
-- 留 App 不搬：library（R+BuildKeys）、CopyLabels（BuildKeys）、utils/image+video（无调用方，死代码）、VulkanCapabilities（调用方全在 UI 层）。
 - ⬜ **W3**：filemanager、game（大头）、database（依赖 game.account，随 W3）。
 
 ## 环境备忘（本机）
