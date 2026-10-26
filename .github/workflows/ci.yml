@@ -25,7 +25,7 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - name: Build & test
-        run: ./gradlew :launchcore:assembleRelease :launchcore:testReleaseUnitTest
+        run: ./gradlew :launchcore:assembleRelease :launchcore:test
 
   app-baseline:
     name: "ZalithLauncher app builds (baseline intact)"
@@ -37,6 +37,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v3
       - name: Install NDK pinned by baseline
         run: sdkmanager --install "ndk;25.2.9519653" >/dev/null
       - name: Assemble app
