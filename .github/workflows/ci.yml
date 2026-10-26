@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  purity-gate:
+    name: ":launchcore UI-free gate"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gate
+        run: bash scripts/gate_core_purity.sh
+
+  launchcore:
+    name: ":launchcore build + unit tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build & test
+        run: ./gradlew :launchcore:assembleRelease :launchcore:testReleaseUnitTest
+
+  app-baseline:
+    name: "ZalithLauncher app builds (baseline intact)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install NDK pinned by baseline
+        run: sdkmanager --install "ndk;25.2.9519653" >/dev/null
+      - name: Assemble app
+        run: ./gradlew :ZalithLauncher:assembleDebug
