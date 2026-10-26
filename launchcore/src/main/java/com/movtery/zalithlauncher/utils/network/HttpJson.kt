@@ -5,6 +5,7 @@ import com.movtery.zalithlauncher.path.createOkHttpClientBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -74,6 +75,27 @@ suspend inline fun <reified R, reified B> postJson(
     context: CoroutineContext = Dispatchers.IO
 ): R = withContext(context) {
     val builder = Request.Builder().url(url).post(json.encodeToString(body).toRequestBody(JSON_MEDIA_TYPE))
+    headers?.forEach { (k, v) -> builder.header(k, v) }
+    client.newCall(builder.build()).execute().use { response ->
+        val bodyText = response.body?.string().orEmpty()
+        if (!response.isSuccessful) throw HttpException(response.code, bodyText.take(200))
+        json.decodeFromString(bodyText)
+    }
+}
+
+/**
+ * POST 表单并解析 JSON 响应（application/x-www-form-urlencoded）。
+ */
+suspend inline fun <reified T> postForm(
+    url: String,
+    form: List<Pair<String, String>>,
+    headers: List<Pair<String, String>>? = null,
+    json: Json = GLOBAL_JSON,
+    client: OkHttpClient = API_CLIENT,
+    context: CoroutineContext = Dispatchers.IO
+): T = withContext(context) {
+    val formBody = FormBody.Builder().apply { form.forEach { (k, v) -> add(k, v) } }.build()
+    val builder = Request.Builder().url(url).post(formBody)
     headers?.forEach { (k, v) -> builder.header(k, v) }
     client.newCall(builder.build()).execute().use { response ->
         val bodyText = response.body?.string().orEmpty()

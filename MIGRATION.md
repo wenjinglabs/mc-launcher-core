@@ -4,7 +4,9 @@
 
 每波验收：`bash scripts/gate_core_purity.sh` + `./gradlew :launchcore:assembleRelease :launchcore:test :ZalithLauncher:assembleDebug` 全绿。
 
-**ADR-13 铁则**：core 单一 HTTP 栈（OkHttp + kotlinx-serialization，零 ktor）。携带 `import io.ktor` 的文件搬入 core 前必须重写为 `utils/network/HttpJson.kt` 助手（fetchJson/postJson/fetchText）；ktor 版客户端与助手留在 App 层（path/AppGlobalClient.kt、utils/network/KtorHttp.kt）。
+**ADR-13 铁则**：core 单一 HTTP 栈（OkHttp + kotlinx-serialization，零 ktor）。携带 `import io.ktor` 的文件搬入 core 前必须重写为 `utils/network/HttpJson.kt` 助手（fetchJson/postJson/postForm/fetchText）；ktor 版客户端与助手留在 App 层（path/AppGlobalClient.kt、utils/network/KtorHttp.kt）。
+
+**W1b 教训**：逐文件审计只查 `import` 不够——**同包符号不经 import**，Kotlin 同包互赖全部隐形。后续波次先按"同包是否有文件留下"补查，再执行搬运。
 
 ## 逐包审计（2026-10-27）
 
@@ -31,8 +33,10 @@
 
 - ✅ **W1a**：`utils/logging` 内核（Level / LogMessage / Logger + 新增 **LoggerConfig**：日志目录、保留天数、横幅、环境信息全部改为宿主注入，解耦 BuildKeys/PathManager/AllSettings/printLauncherInfo）；`zipDirectory` 从 FileUtils 抽出；`provider/FolderProvider.java`。
 - ✅ **W1b-批次一**：**path 包整体**（PathManager/LibPath/LogName + UrlManager 重构）+ **网络三件**（NetWorks/ResilientDns/RegionRestriction）+ **file/string 工具**（FileUtils/zip 适配器家族/InvalidFilenameException/UnpackZipException/_CompareString/StringUtils/ShiftDirection）+ 新增 **NetIdentity**（UA/CurseForge key 宿主注入）与 `isInterruptedIOException`、`isChinaMainland` 抽取。**Zalith2 品牌 URL（14 个常量）拆回 App 层 path/AppUrls.kt，core 保持品牌中立**。launchcore 新增依赖：ktor(client/content-negotiation/serialization)、okhttp、okio、commons-codec/compress、maven-artifact、androidx-core；启用 kotlinx-serialization 插件。
-- ⬜ **W1b-批次二（待做）**：coroutine 子集（Task/TaskLogOutput/TitledTask 需解 ui 依赖）、crashlogs、context、components（解 R）、keepalive（解 R）、utils/image+video+device 子集（需 coil）。
-- ⬜ **W2**：setting、utils 混合部分（LocalUtils/NetWorkUtils）、bridge（JNI 胶水收口 facade）、contract。
+- ✅ **W1b-批次二**：coroutine 纯净四件（DataBridge/FlowExtensions/MutableTransitionStateFlow/TaskStage）+ **crashlogs 全套**（AbstractAPI 已按 ADR-13 重写为 `postForm`；MCLogsAPI/MirroredAPI/响应模型）+ context/Contexts.kt（含 copyAssetFile）+ components 子集（AbstractUnpackTask/InstallableItem/UnpackSingleTask/jre/UnpackJnaTask）。HttpJson 新增 `postForm`。
+- ⬜ **W1b 遗留→W2**：**coroutine 任务引擎**（Task/TaskSystem/TaskFlowExecutor/TaskLogOutput/TitledTask）——挂在 `AndroidStringText`（sealed 模型 + Compose 渲染器混合文件）上，需拆分模型/渲染器后重设计标题抽象再搬；UnpackComponentsTask（依赖带 R 的 Components）、TaskKeepAlive（依赖带 R 的 Service）随 W2 解 R。
+- ⬜ **W2**：setting、utils 混合部分（LocalUtils/NetWorkUtils）、bridge（JNI 胶水收口 facade）、contract、coroutine 任务引擎。
+- 留 App 不搬：library（R+BuildKeys）、CopyLabels（BuildKeys）、utils/image+video（无调用方，死代码）、VulkanCapabilities（调用方全在 UI 层）。
 - ⬜ **W3**：filemanager、game（大头）、database（依赖 game.account，随 W3）。
 
 ## 环境备忘（本机）

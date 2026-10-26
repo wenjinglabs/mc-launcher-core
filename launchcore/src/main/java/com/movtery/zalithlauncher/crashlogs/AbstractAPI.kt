@@ -18,14 +18,7 @@
 
 package com.movtery.zalithlauncher.crashlogs
 
-import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
-import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
-import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.Parameters
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.movtery.zalithlauncher.utils.network.postForm
 
 abstract class AbstractAPI(
     val api: String,
@@ -37,18 +30,7 @@ abstract class AbstractAPI(
      */
     @Throws(Exception::class)
     suspend fun onUpload(content: String): MCLogsResponse {
-        return withContext(Dispatchers.IO) {
-            val response = GLOBAL_CLIENT.post(urlString = api) {
-                setBody(
-                    body = FormDataContent(
-                        formData = Parameters.build {
-                            append("content", content)
-                        }
-                    )
-                )
-            }
-
-            response.safeBodyAsJson<MCLogsResponse>()
-        }
+        //ADR-13：原 ktor FormDataContent 调用重写为 OkHttp 表单 POST
+        return postForm(api, listOf("content" to content))
     }
 }
