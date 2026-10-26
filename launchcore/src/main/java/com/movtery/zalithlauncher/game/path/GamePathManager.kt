@@ -20,11 +20,10 @@ package com.movtery.zalithlauncher.game.path
 
 import android.content.Context
 import com.movtery.zalithlauncher.database.AppDatabase
-import com.movtery.zalithlauncher.game.version.installed.VersionsManager
+import com.movtery.zalithlauncher.game.GameConfig
 import com.movtery.zalithlauncher.path.PathManager
-import com.movtery.zalithlauncher.setting.AllSettings.currentGamePathId
-import com.movtery.zalithlauncher.utils.canHandlePermission
-import com.movtery.zalithlauncher.utils.hasStoragePermission
+import com.movtery.zalithlauncher.utils.StoragePermissionState.canHandlePermission
+import com.movtery.zalithlauncher.utils.StoragePermissionState.hasStoragePermission
 import com.movtery.zalithlauncher.utils.logging.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +48,13 @@ object GamePathManager {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mutex = Mutex()
     private val defaultGamePath = File(PathManager.DIR_FILES_EXTERNAL, ".minecraft").absolutePath
+
+    /**
+     * 版本列表刷新回调（宿主注入；核心库不直接依赖 App 侧的 VersionsManager）
+     */
+    @Volatile
+    var versionsRefresh: ((tag: String) -> Unit)? = null
+
     /**
      * 默认游戏目录的ID
      */
@@ -103,7 +109,7 @@ object GamePathManager {
                     refreshCurrentPath(false)
                 }
 
-                VersionsManager.refresh("GamePathManager.reloadPath")
+                versionsRefresh?.invoke("GamePathManager.reloadPath")
                 Logger.info(TAG, "Loaded ${_gamePathData.value.size} game paths")
             }
         }
@@ -185,20 +191,20 @@ object GamePathManager {
     }
 
     private fun saveCurrentPathUncheck(id: String, reloadVersions: Boolean) {
-        if (currentGamePathId.getValue() == id) return
-        currentGamePathId.save(id)
+        if (GameConfig.currentGamePathId.get() == id) return
+        GameConfig.currentGamePathId.set(id)
         refreshCurrentPath(reloadVersions)
     }
 
     private fun refreshCurrentPath(reloadVersions: Boolean) {
-        val id = currentGamePathId.getValue()
+        val id = GameConfig.currentGamePathId.get()
         _gamePathData.value.find { it.id == id }?.let { item ->
             if (_currentPath.value == item.path) return //避免重复刷新
             val path = item.path
             _currentPath.update { path }
             path.createNoMediaFile()
             if (reloadVersions) {
-                VersionsManager.refresh("GamePathManager.refreshCurrentPath")
+                versionsRefresh?.invoke("GamePathManager.refreshCurrentPath")
             }
         } ?: saveCurrentPath(DEFAULT_ID, reloadVersions)
     }

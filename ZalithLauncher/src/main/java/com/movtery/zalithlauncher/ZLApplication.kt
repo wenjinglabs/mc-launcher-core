@@ -37,7 +37,10 @@ import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.context.refreshContext
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.account.AccountsManager
+import com.movtery.zalithlauncher.game.GameConfig
+import com.movtery.zalithlauncher.game.SettingAccess
 import com.movtery.zalithlauncher.game.path.GamePathManager
+import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import android.content.Intent
 import com.movtery.zalithlauncher.keepalive.TaskKeepAlive
 import com.movtery.zalithlauncher.keepalive.TaskKeepAliveService
@@ -102,6 +105,15 @@ class ZLApplication : Application(), SingletonImageLoader.Factory {
 
             NetIdentity.userAgent = "${BuildKeys.LAUNCHER_SHORT_NAME}/Android_${BuildConfig.VERSION_NAME}"
             NetIdentity.curseforgeApiKey = { BuildKeys.CURSEFORGE_API }
+
+            //核心库的配置桥接（GameConfig / GamePathManager，见各 object 注释）
+            GameConfig.currentGamePathId = SettingAccess(
+                get = { AllSettings.currentGamePathId.getValue() },
+                set = { AllSettings.currentGamePathId.save(it) }
+            )
+            GameConfig.gameDownloadSource = { AllSettings.gameDownloadSource.getValue() }
+            GameConfig.assetPlatformSource = { AllSettings.assetPlatformSource.getValue() }
+            GamePathManager.versionsRefresh = { VersionsManager.refresh(it) }
 
             Logger.initialize(
                 this,

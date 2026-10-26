@@ -60,6 +60,9 @@ fun checkStoragePermissionsForInit(context: Context) {
         canHandlePermission = true
         hasStoragePermission = hasStoragePermissions(context)
     }
+    //镜像到核心库（GamePathManager 等读取）
+    StoragePermissionState.canHandlePermission = canHandlePermission
+    StoragePermissionState.hasStoragePermission = hasStoragePermission
 }
 
 /**
