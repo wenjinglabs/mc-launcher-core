@@ -34,8 +34,9 @@
 - ✅ **W1a**：`utils/logging` 内核（Level / LogMessage / Logger + 新增 **LoggerConfig**：日志目录、保留天数、横幅、环境信息全部改为宿主注入，解耦 BuildKeys/PathManager/AllSettings/printLauncherInfo）；`zipDirectory` 从 FileUtils 抽出；`provider/FolderProvider.java`。
 - ✅ **W1b-批次一**：**path 包整体**（PathManager/LibPath/LogName + UrlManager 重构）+ **网络三件**（NetWorks/ResilientDns/RegionRestriction）+ **file/string 工具**（FileUtils/zip 适配器家族/InvalidFilenameException/UnpackZipException/_CompareString/StringUtils/ShiftDirection）+ 新增 **NetIdentity**（UA/CurseForge key 宿主注入）与 `isInterruptedIOException`、`isChinaMainland` 抽取。**Zalith2 品牌 URL（14 个常量）拆回 App 层 path/AppUrls.kt，core 保持品牌中立**。launchcore 新增依赖：ktor(client/content-negotiation/serialization)、okhttp、okio、commons-codec/compress、maven-artifact、androidx-core；启用 kotlinx-serialization 插件。
 - ✅ **W1b-批次二**：coroutine 纯净四件（DataBridge/FlowExtensions/MutableTransitionStateFlow/TaskStage）+ **crashlogs 全套**（AbstractAPI 已按 ADR-13 重写为 `postForm`；MCLogsAPI/MirroredAPI/响应模型）+ context/Contexts.kt（含 copyAssetFile）+ components 子集（AbstractUnpackTask/InstallableItem/UnpackSingleTask/jre/UnpackJnaTask）。HttpJson 新增 `postForm`。
-- ⬜ **W1b 遗留→W2**：**coroutine 任务引擎**（Task/TaskSystem/TaskFlowExecutor/TaskLogOutput/TitledTask）——挂在 `AndroidStringText`（sealed 模型 + Compose 渲染器混合文件）上，需拆分模型/渲染器后重设计标题抽象再搬；UnpackComponentsTask（依赖带 R 的 Components）、TaskKeepAlive（依赖带 R 的 Service）随 W2 解 R。
-- ⬜ **W2**：setting、utils 混合部分（LocalUtils/NetWorkUtils）、bridge（JNI 胶水收口 facade）、contract、coroutine 任务引擎。
+- ✅ **W2a**：**AndroidStringText 拆分**——模型（非 sealed 接口 + Text/StringRes/Appended + 工厂/DSL）进 core（FQCN 不变，宿主可扩展变体）；App 层保留渲染器/富文本变体 `AnnotatedText`/`toAndroidString`（ui/AndroidStringTextCompose.kt）。**coroutine 任务引擎全套五件**（Task/TitledTask/TaskLogOutput/TaskSystem/TaskFlowExecutor）进 core。**TaskKeepAlive** 进 core（前台 Service 经 `serviceIntentProvider` 注入，Service 留 App）。
+- ⬜ **W2b（待做）**：setting 包（27 文件，5 个 compose 待拆）、LocalUtils/NetWorkUtils 混合部分抽取。
+- ⬜ **W2c（待做）**：bridge（JNI 胶水收口 facade）。contract（ActivityResultContract，纯 UI）留 App。UnpackComponentsTask（依赖带 R 的 Components）随 W3 game 包一起处理。
 - 留 App 不搬：library（R+BuildKeys）、CopyLabels（BuildKeys）、utils/image+video（无调用方，死代码）、VulkanCapabilities（调用方全在 UI 层）。
 - ⬜ **W3**：filemanager、game（大头）、database（依赖 game.account，随 W3）。
 

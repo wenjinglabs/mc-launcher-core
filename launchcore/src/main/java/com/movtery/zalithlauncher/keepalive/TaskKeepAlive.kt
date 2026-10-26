@@ -35,6 +35,10 @@ private const val TAG = "TaskKeepAlive"
 
 /**
  * 任务保活控制器
+ *
+ * M1 迁移注记：前台 Service 的具体类由宿主经 [serviceIntentProvider] 注入
+ * （Service 属于 App 身份层，携带图标与通知文案）；未注入时保活计数仍工作，
+ * 仅跳过前台服务的启停。
  */
 object TaskKeepAlive {
     /**
@@ -45,6 +49,12 @@ object TaskKeepAlive {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val activeCount = AtomicInteger(0)
     private var stopJob: Job? = null
+
+    /**
+     * 宿主注入：构造前台服务的启动 Intent。返回 null 表示宿主不提供保活服务。
+     */
+    @Volatile
+    var serviceIntentProvider: (() -> Intent?)? = null
 
     /** 应用级 Context，在 Application 启动时赋值，可能被其他线程读取 */
     @Volatile
@@ -111,12 +121,10 @@ object TaskKeepAlive {
             Logger.warning(TAG, "The application context is not initialized, skip starting the task keep-alive service.")
             return
         }
+        val intent = serviceIntentProvider?.invoke() ?: return
 
         runCatching {
-            ContextCompat.startForegroundService(
-                context,
-                Intent(context, TaskKeepAliveService::class.java)
-            )
+            ContextCompat.startForegroundService(context, intent)
         }.onFailure { e ->
             //应用处于后台等受限状态时系统会拒绝启动前台服务，此时忽略即可
             Logger.error(TAG, "Failed to start the task keep-alive service", e)
@@ -125,8 +133,9 @@ object TaskKeepAlive {
 
     private fun stopService() {
         val context = appContext ?: return
+        val intent = serviceIntentProvider?.invoke() ?: return
         runCatching {
-            context.stopService(Intent(context, TaskKeepAliveService::class.java))
+            context.stopService(intent)
         }.onFailure { e ->
             Logger.error(TAG, "Failed to stop the task keep-alive service", e)
         }

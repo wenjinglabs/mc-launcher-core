@@ -38,7 +38,9 @@ import com.movtery.zalithlauncher.context.refreshContext
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.path.GamePathManager
+import android.content.Intent
 import com.movtery.zalithlauncher.keepalive.TaskKeepAlive
+import com.movtery.zalithlauncher.keepalive.TaskKeepAliveService
 import com.movtery.zalithlauncher.path.NetIdentity
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -67,6 +69,9 @@ class ZLApplication : Application(), SingletonImageLoader.Factory {
         refreshContext(this)
         //初始化任务保活控制器，需在任何任务开始前完成初始化
         TaskKeepAlive.initialize(this)
+        TaskKeepAlive.serviceIntentProvider = {
+            Intent(this, TaskKeepAliveService::class.java)
+        }
 
         Thread.setDefaultUncaughtExceptionHandler { _, th ->
             //停止所有任务
