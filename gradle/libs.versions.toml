@@ -18,6 +18,7 @@ editorBom = "0.24.6"
 fishnet = "1.1.0"
 gson = "2.14.0"
 kotlin = "2.4.20"
+serializationJson = "1.11.0"
 kspPlugin = "2.3.12"
 coreKtx = "1.19.1"
 kotlinxCoroutinesAndroid = "1.11.0"
@@ -102,6 +103,7 @@ commons-io = { module = "commons-io:commons-io", version.ref = "commonsIo" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serializationJson" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

@@ -18,10 +18,8 @@
 
 package com.movtery.zalithlauncher.utils
 
-import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
 import com.movtery.zalithlauncher.utils.logging.Logger
-import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
-import io.ktor.client.request.get
+import com.movtery.zalithlauncher.utils.network.fetchJson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -102,7 +100,7 @@ object RegionRestriction {
         for (provider in GEO_IP_PROVIDERS) {
             val info = runCatching {
                 withTimeout(PROVIDER_TIMEOUT_MILLIS.milliseconds) {
-                    GLOBAL_CLIENT.get(provider).safeBodyAsJson<IpGeoInfo>()
+                    fetchJson<IpGeoInfo>(provider)
                 }
             }.onFailure {
                 Logger.warning(TAG, "Failed to query IP geo location from $provider", it)

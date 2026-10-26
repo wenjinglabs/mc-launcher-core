@@ -18,95 +18,21 @@
 
 package com.movtery.zalithlauncher.utils.network
 
-import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
-import com.movtery.zalithlauncher.path.GLOBAL_JSON
 import com.movtery.zalithlauncher.utils.logging.Logger
-import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.request.forms.submitForm
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.ContentType
-import io.ktor.http.Parameters
-import io.ktor.http.contentType
-import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.decodeFromStream
 import java.io.IOException
 import java.nio.channels.UnresolvedAddressException
-import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "NetWorks"
 
-@OptIn(ExperimentalSerializationApi::class)
-suspend inline fun <reified T> HttpResponse.safeBodyAsJson(): T {
-    return GLOBAL_JSON.decodeFromStream(bodyAsChannel().toInputStream())
-}
-
-suspend fun HttpResponse.safeBodyAsText(): String {
-    val channel = bodyAsChannel()
-    return channel.toInputStream().bufferedReader().use { reader ->
-        val buffer = CharArray(8 * 1024)
-        val sb = StringBuilder()
-        var read: Int
-        while (reader.read(buffer).also { read = it } != -1) {
-            sb.appendRange(buffer, 0, read)
-        }
-        sb.toString()
-    }
-}
-
-suspend inline fun <reified T> submitForm(
-    url: String,
-    parameters: Parameters,
-    context: CoroutineContext = Dispatchers.IO
-): T = withContext(context) {
-    GLOBAL_CLIENT.submitForm(
-        url = url,
-        formParameters = parameters
-    ) {
-        contentType(ContentType.Application.FormUrlEncoded)
-    }.body()
-}
-
-suspend inline fun <reified T> httpPostJson(
-    url: String,
-    headers: List<Pair<String, Any?>>? = null,
-    body: Any,
-    context: CoroutineContext = Dispatchers.IO
-): T = withContext(context) {
-    GLOBAL_CLIENT.post(url) {
-        contentType(ContentType.Application.Json)
-        headers?.takeIf { it.isNotEmpty() }?.forEach { (k, v) -> header(k, v) }
-        setBody(body)
-    }.safeBodyAsJson()
-}
-
-suspend inline fun <reified T> httpGetJson(
-    url: String,
-    headers: List<Pair<String, Any?>>? = null,
-    parameters: Parameters? = null,
-    context: CoroutineContext = Dispatchers.IO
-): T = withContext(context) {
-    GLOBAL_CLIENT.get(url) {
-        headers?.takeIf { it.isNotEmpty() }?.forEach { (k, v) -> header(k, v) }
-        parameters?.let { value ->
-            url {
-                this.parameters.appendAll(value)
-            }
-        }
-    }.safeBodyAsJson()
-}
-
+/**
+ * 带指数退避的重试。协程取消不重试；5xx / DNS 失败 / IO 错误可重试。
+ *
+ * M1 迁移注记：原文件中的 ktor 助手（safeBodyAsJson/submitForm/httpGetJson 等）
+ * 已随 ADR-13 移回 App 层 KtorHttp.kt；core 统一走 [fetchJson]（HttpJson.kt）。
+ */
 suspend fun <T> withRetry(
     logTag: String,
     maxRetries: Int = 3,
@@ -143,7 +69,7 @@ suspend fun <T> withRetry(
 
 private fun canRetry(e: Exception): Boolean {
     return when (e) {
-        is ClientRequestException -> e.response.status.value in 500..599 //5xx错误可重试
+        is HttpException -> e.code in 500..599 //5xx错误可重试
         is UnresolvedAddressException -> true // DNS解析失败，可能是临时性故障
         is IOException -> true //网络错误
         else -> false

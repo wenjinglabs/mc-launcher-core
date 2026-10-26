@@ -4,6 +4,8 @@
 
 每波验收：`bash scripts/gate_core_purity.sh` + `./gradlew :launchcore:assembleRelease :launchcore:test :ZalithLauncher:assembleDebug` 全绿。
 
+**ADR-13 铁则**：core 单一 HTTP 栈（OkHttp + kotlinx-serialization，零 ktor）。携带 `import io.ktor` 的文件搬入 core 前必须重写为 `utils/network/HttpJson.kt` 助手（fetchJson/postJson/fetchText）；ktor 版客户端与助手留在 App 层（path/AppGlobalClient.kt、utils/network/KtorHttp.kt）。
+
 ## 逐包审计（2026-10-27）
 
 | 包 | 文件数 | compose | toast | activity | hilt | 波次 |

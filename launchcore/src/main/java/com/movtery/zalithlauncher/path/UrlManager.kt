@@ -19,15 +19,6 @@
 package com.movtery.zalithlauncher.path
 
 import com.movtery.zalithlauncher.utils.network.ResilientDns
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.HttpRequestPipeline
-import io.ktor.client.request.header
-import io.ktor.http.HttpHeaders
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import okhttp3.ConnectionPool
 import okhttp3.Interceptor
@@ -40,6 +31,8 @@ import java.util.concurrent.TimeUnit
 /**
  * M1 迁移注记：UA 与 CurseForge Key 改为 [NetIdentity] 注入；Zalith2 品牌 URL
  * （项目主页/捐赠/插件源等）拆回 App 层的 path/AppUrls.kt，核心库保持品牌中立。
+ * ADR-13：core 不含 ktor——JSON API 层在 utils/network/HttpJson.kt（OkHttp 直连）；
+ * 原 GLOBAL_CLIENT（ktor 版）已移至 App 层 path/AppGlobalClient.kt。
  */
 val URL_USER_AGENT: String get() = NetIdentity.userAgent
 val TIME_OUT = TimeUnit.SECONDS.toMillis(30L)
@@ -98,33 +91,6 @@ val GLOBAL_JSON = Json {
     ignoreUnknownKeys = true
     explicitNulls = true
     coerceInputValues = true
-}
-
-val GLOBAL_CLIENT = HttpClient(OkHttp) {
-    install(HttpTimeout) {
-        requestTimeoutMillis = TIME_OUT
-    }
-    install(ContentNegotiation) {
-        json(GLOBAL_JSON)
-    }
-    expectSuccess = true
-
-    defaultRequest {
-        header(HttpHeaders.UserAgent, URL_USER_AGENT)
-    }
-    engine {
-        // 使用内置的 OkHttp 客户端
-        preconfigured = createOkHttpClientBuilder().build()
-    }
-}.apply {
-    requestPipeline.intercept(HttpRequestPipeline.State) {
-        if (isCurseForgeHost(context.url.host)) {
-            val apiKey = NetIdentity.curseforgeApiKey()
-            if (apiKey.isNotBlank()) {
-                context.header("x-api-key", apiKey)
-            }
-        }
-    }
 }
 
 fun createRequestBuilder(url: String): Request.Builder {

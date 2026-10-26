@@ -42,7 +42,7 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 - [x] **M0**（本阶段）：硬 fork 2.7.2、`:launchcore` 模块 + API 草案、纯净度门禁、PROJECT.md
 - [ ] **M1**：边界重构——按包映射搬家、解开 Compose/Toast/Activity 依赖、门禁脚本持续绿灯（本地执行）。交付：App 功能不变，core 无 Android UI 依赖
 - [ ] **M2**：对外 0.1（JitPack）——`MinecraftSurface` + 组件库第一组（安装进度/账号登录/启动按钮/崩溃面板）、sample 离线启动 arm64（≈30 行）、get-started 文档
-- [ ] **M3**：0.2——runtime packs 按需下载上线（AAR 瘦身达标）、微软登录、渲染器切换；瘦身评估含 **ktor 层去留**（ktor-on-okhttp 与裸 OkHttp 双栈并存，替换面集中在 NetWorks.kt 门面；以 AAR 实测体积定去留，目标 OkHttp + kotlinx-serialization 单栈）
+- [ ] **M3**：0.2——runtime packs 按需下载上线（AAR 瘦身达标）、微软登录、渲染器切换
 - [ ] **M4**：1.0——mod loader 安装、reference-app 验收、迁 Maven Central、锁 API
 
 ## 架构决策（ADR）
@@ -70,6 +70,8 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 **ADR-11 微软登录 Client ID 由宿主注入**（2026-10-27 维护者决策）。库不内置任何 OAuth Client ID，也不复用上游 MovTery 的注册；宿主注册自己的 Azure 应用，经 `LaunchCoreConfig.microsoftClientId` 传入，未配置时 `Auth.microsoft` 抛 IllegalStateException。离线登录零依赖，get-started 不受影响。
 
 **ADR-12 runtime packs 托管**（2026-10-27 维护者决策）。权威源挂 wenjinglabs 个人 GitHub Releases；国内镜像（Cloudflare R2）M3 落地时开通；游戏本体文件继续走 BMCLAPI。
+
+**ADR-13 core 单一 HTTP 栈，零 ktor**（2026-10-27 维护者决策）。core 只用 OkHttp（下载/API 共用引擎）+ kotlinx-serialization（JSON），不再引入 ktor——原先 ktor-on-okhttp 与裸 OkHttp 双栈冗余。core 的 JSON API 层为 `utils/network/HttpJson.kt`（fetchJson/postJson/fetchText + HttpException）；ktor 版 GLOBAL_CLIENT 与助手原样移至 App 层（path/AppGlobalClient.kt、utils/network/KtorHttp.kt）。**铁则：任何携带 ktor import 的文件搬入 core 时，必须先重写为 HttpJson 助手**（ktor 只属于 App 的 viewmodel/ui 层）。
 
 ## 测试策略（headless 优先）
 
