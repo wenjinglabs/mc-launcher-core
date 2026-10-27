@@ -1,7 +1,7 @@
 package org.lwjgl.glfw;
 
-import static com.movtery.zalithlauncher.bridge.ZLBridgeStatesKt.CURSOR_DISABLED;
-import static com.movtery.zalithlauncher.bridge.ZLBridgeStatesKt.CURSOR_ENABLED;
+import static com.movtery.zalithlauncher.bridge.CursorStatesKt.CURSOR_DISABLED;
+import static com.movtery.zalithlauncher.bridge.CursorStatesKt.CURSOR_ENABLED;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -17,8 +17,8 @@ import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
 
 import com.movtery.inputmap.keycodes.LwjglGlfwKeycode;
-import com.movtery.zalithlauncher.BuildKeys;
 import com.movtery.zalithlauncher.bridge.CursorShape;
+import com.movtery.zalithlauncher.path.NetIdentity;
 import com.movtery.zalithlauncher.bridge.LoggerBridge;
 import com.movtery.zalithlauncher.bridge.NativeLibraryLoader;
 import com.movtery.zalithlauncher.bridge.ZLBridgeStates;
@@ -349,7 +349,7 @@ public class CallbackBridge {
         String result = null;
         switch (type) {
             case CLIPBOARD_COPY:
-                ClipData clip = ClipData.newPlainText(BuildKeys.INSTANCE.getLAUNCHER_IDENTIFIER(), copy);
+                ClipData clip = ClipData.newPlainText(NetIdentity.INSTANCE.getLauncherIdentifier(), copy);
                 clipboard.setPrimaryClip(clip);
                 break;
             case CLIPBOARD_PASTE:

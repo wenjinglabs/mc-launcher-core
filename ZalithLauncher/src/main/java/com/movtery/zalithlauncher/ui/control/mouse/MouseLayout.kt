@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.control.mouse
 
+import com.movtery.zalithlauncher.bridge.composeIcon
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
