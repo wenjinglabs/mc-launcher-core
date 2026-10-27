@@ -18,7 +18,7 @@
 
 package com.movtery.zalithlauncher.game.version.saves
 
-import com.movtery.zalithlauncher.R
+import io.launchcore.core.R
 
 /**
  * @param levelCode 在 level.dat 中存储的值

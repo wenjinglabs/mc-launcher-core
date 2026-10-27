@@ -25,7 +25,7 @@ import com.movtery.zalithlauncher.game.launch.GameLaunchFlow
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.ui.screens.content.elements.LaunchGameOperation
-import com.movtery.zalithlauncher.ui.screens.content.elements.QuickPlay
+import com.movtery.zalithlauncher.game.launch.QuickPlay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

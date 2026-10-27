@@ -46,6 +46,11 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.kotlinx.serialization.json)
+    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    // ADR-14：仅 compose.runtime 状态库（BOM 对齐版本，不引入渲染层）
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.proxy.client.android)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

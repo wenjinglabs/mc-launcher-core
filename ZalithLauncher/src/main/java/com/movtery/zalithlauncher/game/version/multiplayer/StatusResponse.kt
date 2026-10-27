@@ -18,7 +18,6 @@
 
 package com.movtery.zalithlauncher.game.version.multiplayer
 
-import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.movtery.zalithlauncher.game.text.TextColor
 import com.movtery.zalithlauncher.game.text.parseColorFromIdentifier
@@ -226,7 +225,7 @@ private fun JsonObject.tryParseText(
         val color = get("color")?.jsonPrimitive?.contentOrNull?.let { content ->
             if (content.startsWith('#')) {
                 runCatching {
-                    val color = Color(content.toColorInt())
+                    val color = content.toColorInt().toLong() and 0xFFFFFFFFL
                     //动态生成阴影色
                     val background = shadowColor(color)
                     TextColor(color, background)

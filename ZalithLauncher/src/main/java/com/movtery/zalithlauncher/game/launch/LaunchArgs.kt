@@ -38,7 +38,7 @@ import com.movtery.zalithlauncher.game.version.installed.VersionInfo
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.path.LibPath
 import com.movtery.zalithlauncher.path.PathManager
-import com.movtery.zalithlauncher.ui.screens.content.elements.QuickPlay
+import com.movtery.zalithlauncher.game.launch.QuickPlay
 import com.movtery.zalithlauncher.utils.file.child
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.ServerAddress

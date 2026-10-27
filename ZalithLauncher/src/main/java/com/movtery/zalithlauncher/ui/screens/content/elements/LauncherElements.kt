@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content.elements
 
+import com.movtery.zalithlauncher.game.launch.QuickPlay
 import android.app.Activity
 import android.net.Uri
 import android.os.Build
@@ -111,17 +112,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import java.io.File
-
-@Parcelize
-sealed interface QuickPlay : Parcelable {
-    /** 快速启动游玩存档  仅支持 1.20+ 23w14a+ */
-    @Parcelize
-    data class Save(val saveName: String): QuickPlay
-
-    /** 快速启动游玩服务器 */
-    @Parcelize
-    data class Server(val serverAddress: String): QuickPlay
-}
 
 sealed interface LaunchGameOperation {
     data object None : LaunchGameOperation

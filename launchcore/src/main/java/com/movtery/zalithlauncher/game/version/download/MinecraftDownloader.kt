@@ -19,7 +19,7 @@
 package com.movtery.zalithlauncher.game.version.download
 
 import android.content.Context
-import com.movtery.zalithlauncher.R
+import io.launchcore.core.R
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.game.path.getGameHome
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest

@@ -18,6 +18,8 @@
 
 package com.movtery.zalithlauncher.game.version.installed
 
+import com.movtery.zalithlauncher.path.NetIdentity
+import com.movtery.zalithlauncher.game.GameConfig
 import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.Keep
@@ -25,16 +27,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.google.gson.JsonObject
-import com.movtery.zalithlauncher.BuildConfig
-import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.game.launch.LogName
 import com.movtery.zalithlauncher.game.path.getVersionsHome
 import com.movtery.zalithlauncher.game.support.touch_controller.VibrationHandler
 import com.movtery.zalithlauncher.path.PathManager
-import com.movtery.zalithlauncher.setting.AllSettings
-import com.movtery.zalithlauncher.setting.unit.getOrMin
-import com.movtery.zalithlauncher.ui.screens.content.elements.QuickPlay
+import com.movtery.zalithlauncher.game.launch.QuickPlay
 import com.movtery.zalithlauncher.utils.GSON
 import com.movtery.zalithlauncher.utils.file.readText
 import com.movtery.zalithlauncher.utils.logging.Logger
@@ -124,7 +122,7 @@ class Version(
     /**
      * @return 启动器版本标识文件夹
      */
-    fun getZalithVersionPath(): File = File(getVersionPath(), BuildKeys.LAUNCHER_IDENTIFIER)
+    fun getZalithVersionPath(): File = File(getVersionPath(), NetIdentity.launcherIdentifier)
 
     /**
      * @return 游戏的上一次运行日志
@@ -203,14 +201,14 @@ class Version(
 
     private fun String.getValueOrDefault(default: String): String = this.takeIf { it.isNotEmpty() } ?: default
 
-    fun getRenderer(): String = versionConfig.renderer.getValueOrDefault(AllSettings.renderer.getValue())
+    fun getRenderer(): String = versionConfig.renderer.getValueOrDefault(GameConfig.renderer())
 
-    fun getDriver(): String = versionConfig.driver.getValueOrDefault(AllSettings.vulkanDriver.getValue())
+    fun getDriver(): String = versionConfig.driver.getValueOrDefault(GameConfig.vulkanDriver())
 
-    fun getGraphicsApi(): GraphicsApi = versionConfig.graphicsApi ?: AllSettings.graphicsApi.getValue()
+    fun getGraphicsApi(): GraphicsApi = versionConfig.graphicsApi ?: GameConfig.graphicsApi()
 
     fun getControlPath(): File? = versionConfig.control
-        .getValueOrDefault(AllSettings.controlLayout.getValue())
+        .getValueOrDefault(GameConfig.controlLayout())
         .takeIf { it.isNotEmpty() }
         ?.let { fileName -> File(PathManager.DIR_CONTROL_LAYOUTS, fileName) }
 
@@ -220,14 +218,14 @@ class Version(
 
     fun getGameArgs(): String = versionConfig.gameArgs
 
-    fun getCustomInfo(): String = versionConfig.customInfo.getValueOrDefault(AllSettings.versionCustomInfo.getValue())
-        .replace("[zl_version]", BuildConfig.VERSION_NAME)
+    fun getCustomInfo(): String = versionConfig.customInfo.getValueOrDefault(GameConfig.versionCustomInfo())
+        .replace("[zl_version]", NetIdentity.launcherVersion)
 
     fun getServerIp(): String? = versionConfig.serverIp.takeIf { it.isNotEmptyOrBlank() }
 
     fun getRamAllocation(context: Context = GlobalContext): Int = versionConfig.ramAllocation.takeIf { it >= 256 }?.let {
         min(it, getMaxMemoryForSettings(context))
-    } ?: AllSettings.ramAllocation.getOrMin()
+    } ?: GameConfig.ramAllocation()
 
     fun getTouchVibrateDuration(): Int? = versionConfig.touchVibrateDuration.takeIf { it >= 80 }
 
@@ -235,7 +233,7 @@ class Version(
 }
 
 /** 通过版本文件夹获取启动器版本标识文件夹 */
-fun getZalithVersionPath(versionFolder: File): File = File(versionFolder, BuildKeys.LAUNCHER_IDENTIFIER)
+fun getZalithVersionPath(versionFolder: File): File = File(versionFolder, NetIdentity.launcherIdentifier)
 
 /** 通过版本文件夹获取版本图标文件 */
 fun getVersionIconFile(versionFolder: File): File = File(getZalithVersionPath(versionFolder), "VersionIcon.png")

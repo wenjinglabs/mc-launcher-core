@@ -73,6 +73,8 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 
 **ADR-13 core 单一 HTTP 栈，零 ktor**（2026-10-27 维护者决策）。core 只用 OkHttp（下载/API 共用引擎）+ kotlinx-serialization（JSON），不再引入 ktor——原先 ktor-on-okhttp 与裸 OkHttp 双栈冗余。core 的 JSON API 层为 `utils/network/HttpJson.kt`（fetchJson/postJson/fetchText + HttpException）；ktor 版 GLOBAL_CLIENT 与助手原样移至 App 层（path/AppGlobalClient.kt、utils/network/KtorHttp.kt）。**铁则：任何携带 ktor import 的文件搬入 core 时，必须先重写为 HttpJson 助手**（ktor 只属于 App 的 viewmodel/ui 层）。
 
+**ADR-14 门禁修正案：compose.runtime 入 core**（2026-10-27 维护者批准）。门禁改为只允许 `androidx.compose.runtime`（纯状态管理库，无渲染、无 android UI 类）；compose.ui/foundation/material/animation 等渲染层与 Toast/Activity 依旧全禁。立法本意不变——core 不渲染、不做 UI 决定；mutableStateOf 只是可观察状态载体，是本代码库唯一的状态栈（与 Room 同构论证：非冗余）。动因：Version/LocalMod/RemoteMod/ServerData 四个核心域模型内嵌 compose 状态，App 侧约 30 处读取；重写 StateFlow 属于无收益手术。
+
 ## 测试策略（headless 优先）
 
 | 层 | 覆盖 | 工具 | 模拟器 |

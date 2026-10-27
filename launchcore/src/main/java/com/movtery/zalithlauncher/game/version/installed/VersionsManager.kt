@@ -38,6 +38,10 @@ import java.util.concurrent.CopyOnWriteArrayList
 private const val TAG = "VersionsManager"
 
 object VersionsManager {
+    /** 宿主注入：版本列表变化后清理失效 ViewModelStore（UI 架构属于 App 层） */
+    @Volatile
+    var vmStoresCleaner: ((List<Version>) -> Unit)? = null
+
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mutex = Mutex()
     private val listeners: MutableList<suspend () -> Unit> = CopyOnWriteArrayList()
@@ -129,7 +133,8 @@ object VersionsManager {
                 }
 
                 //清理随已失效的旧版本对象创建的 ViewModelStore（仍被承载屏幕持有的会被跳过）
-                VersionViewModelStores.clearStale(newVersions)
+                //UI 架构（ViewModelStore）归宿主，经钩子回调
+                vmStoresCleaner?.invoke(newVersions)
 
                 _isRefreshing.update { false }
             }

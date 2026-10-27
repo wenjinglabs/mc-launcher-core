@@ -865,7 +865,8 @@ private fun SaveInfoTooltip(
         }
         //游戏时长
         if (saveData.playTime != null) {
-            val duration = (saveData.playTime / 20).toDuration(DurationUnit.SECONDS)
+            val playTimeTicks: Long = saveData.playTime ?: 0L
+            val duration = (playTimeTicks / 20).toDuration(DurationUnit.SECONDS)
             val playtime = duration.toComponents { days, hours, minutes, _, _ ->
                 stringResource(R.string.duration_format, days, hours, minutes)
             }

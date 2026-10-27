@@ -18,13 +18,13 @@
 
 package com.movtery.zalithlauncher.game.version.installed
 
+import com.movtery.zalithlauncher.game.GameConfig
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
-import com.movtery.zalithlauncher.R
+import io.launchcore.core.R
 import com.movtery.zalithlauncher.game.support.touch_controller.VibrationHandler
-import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.utils.GSON
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.string.getStringNotNull
@@ -188,9 +188,9 @@ class VersionConfig(
         this.versionPath = versionPath
     }
 
-    fun isIsolation(): Boolean = isolationType.toBoolean(AllSettings.versionIsolation.getValue())
+    fun isIsolation(): Boolean = isolationType.toBoolean(GameConfig.versionIsolation())
 
-    fun skipGameIntegrityCheck(): Boolean = skipGameIntegrityCheck.toBoolean(AllSettings.skipGameIntegrityCheck.getValue())
+    fun skipGameIntegrityCheck(): Boolean = skipGameIntegrityCheck.toBoolean(GameConfig.skipGameIntegrityCheck())
 
     private fun SettingState.toBoolean(global: Boolean) = when(getSettingStateNotNull(this)) {
         SettingState.FOLLOW_GLOBAL -> global

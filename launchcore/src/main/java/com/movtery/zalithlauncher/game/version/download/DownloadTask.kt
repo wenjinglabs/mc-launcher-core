@@ -52,7 +52,7 @@ class DownloadTask(
 
     var fileDownloadedTask: (suspend () -> Unit)? = null
 
-    internal fun toRequest(): DownloadRequest = DownloadRequest(
+    fun toRequest(): DownloadRequest = DownloadRequest(
         urls = urls,
         targetFile = targetFile,
         sha1 = sha1,

@@ -292,8 +292,8 @@ private fun parseSegments(input: String): List<Pair<String, TextStyleState>> {
                 in MINECRAFT_COLOR_FORMAT -> {
                     val colors = MINECRAFT_COLOR_FORMAT[code]!!
                     currentStyle.copy(
-                        color = colors.foreground,
-                        background = colors.background
+                        color = Color(colors.foreground),
+                        background = Color(colors.background)
                     )
                 }
                 'r' -> TextStyleState() //重置样式
@@ -320,8 +320,8 @@ private fun parseSegments(input: String): List<Pair<String, TextStyleState>> {
 
 private fun parseTextWithStyle(input: ComponentDescription) =
     input.text to TextStyleState(
-        color = input.color?.foreground ?: WHITE.foreground,
-        background = input.color?.background ?: WHITE.background,
+        color = Color(input.color?.foreground ?: WHITE.foreground),
+        background = Color(input.color?.background ?: WHITE.background),
         bold = input.bold ?: false,
         italic = input.italic ?: false,
         underline = input.underlined ?: false,
@@ -413,8 +413,8 @@ fun ComponentText(
  * @param strikethrough 删除线
  */
 private data class TextStyleState(
-    val color: Color? = WHITE.foreground,
-    val background: Color? = WHITE.background,
+    val color: Color? = Color(WHITE.foreground),
+    val background: Color? = Color(WHITE.background),
     val bold: Boolean = false,
     val italic: Boolean = false,
     val underline: Boolean = false,

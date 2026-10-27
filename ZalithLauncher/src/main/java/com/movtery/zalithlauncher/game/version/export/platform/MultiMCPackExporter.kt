@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.version.export.platform
 
+import com.movtery.zalithlauncher.path.NetIdentity
 import android.content.Context
 import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.R
