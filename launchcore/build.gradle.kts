@@ -52,6 +52,8 @@ dependencies {
     implementation(project(":InputMap"))
     implementation(libs.androidx.compose.runtime)
     implementation(libs.proxy.client.android)
+    implementation(libs.mmkv)
+    implementation(libs.toml4j)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

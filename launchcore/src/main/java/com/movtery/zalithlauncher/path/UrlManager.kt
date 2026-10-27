@@ -40,6 +40,8 @@ val TIME_OUT = TimeUnit.SECONDS.toMillis(30L)
 const val HOST_CURSEFORGE_API = "api.curseforge.com"
 const val CURSEFORGE_CDN_SUFFIX = "forgecdn.net"
 
+const val URL_MCMOD: String = "https://www.mcmod.cn/"
+
 // Mojang 官方协议端点（版本/资产下载属于核心库职责）
 const val URL_MINECRAFT_VERSION_REPOS: String = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 const val URL_MINECRAFT_ASSETS_INDEX: String = "https://launchermeta.mojang.com/v1/packages"

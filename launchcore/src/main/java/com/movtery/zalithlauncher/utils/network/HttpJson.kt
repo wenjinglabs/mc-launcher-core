@@ -25,6 +25,17 @@ class HttpException(val code: Int, message: String) : IOException("HTTP $code: $
 @PublishedApi
 internal val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
+/**
+ * 查询参数构建 DSL（形状对齐原 ktor Parameters.build，便于调用点迁移）
+ */
+class Query {
+    internal val pairs = mutableListOf<Pair<String, String>>()
+    fun append(key: String, value: String?) { pairs.add(key to (value ?: "")) }
+}
+
+fun query(build: Query.() -> Unit): List<Pair<String, String>> =
+    Query().apply(build).pairs
+
 @PublishedApi
 internal fun encodeQuery(query: List<Pair<String, String>>): String =
     query.joinToString("&") { (k, v) ->

@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.download.assets.platform
 
+import com.movtery.zalithlauncher.game.GameConfig
 import android.util.Log
 import com.movtery.zalithlauncher.game.addons.mirror.MirrorPriority
 import com.movtery.zalithlauncher.game.addons.mirror.resolveMirrorPriority
@@ -29,7 +30,6 @@ import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.MCIM_MO
 import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.ModrinthSearcher
 import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.models.ModrinthVersion
 import com.movtery.zalithlauncher.game.download.assets.utils.localizedModSearchKeywords
-import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.DownloadAssetsState
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.SearchAssetsState
 import com.movtery.zalithlauncher.utils.isChinaMainland
@@ -62,79 +62,6 @@ private val mirrorCurseForgeSearcher = CurseForgeSearcher(
 /**
  * 对资源平台搜索启用镜像源机制进行操作
  */
-suspend fun <E: AbstractPlatformSearcher, T> mirroredPlatformSearcher(
-    searchers: List<E>,
-    printLog: Boolean = true,
-    block: suspend (E) -> T
-): T {
-    require(searchers.isNotEmpty()) { "Searcher list must not be empty." }
-
-    val errors = mutableListOf<Exception>()
-    var lastException: Exception? = null
-
-    for (searcher in searchers) {
-        try {
-            if (printLog) {
-                Logger.debug(TAG, "Starting to attempt to perform the operation on source: {${searcher.source}}")
-            }
-            return block(searcher)
-        } catch (e: Exception) {
-            Log.w("PlatformSearcher", "Failed to perform the operation on source: {${searcher.source}}", e)
-            lastException = e
-
-            if (e.isInterruptedIOException()) {
-                throw e
-            } else if (e is FileNotFoundException) {
-                errors.add(e)
-                break
-            } else {
-                errors.add(e)
-            }
-        }
-    }
-
-    if (printLog) {
-        Logger.warning(TAG, 
-            msg = "An error occurred during this search.",
-            t = IOException("All sources have failed to attempt", lastException).apply {
-                errors.forEachIndexed { i, e ->
-                    addSuppressed(Exception("Mirror error #${i + 1}: ${e.message}"))
-                }
-            }
-        )
-    }
-    throw lastException ?: IllegalStateException("Should not have executed to this stage.")
-}
-
-/**
- * 镜像源只能在中国地区使用
- */
-fun mirroredCurseForgeSource(
-    enabledMirror: Boolean = isChinaMainland()
-): List<CurseForgeSearcher> {
-    val source = resolveMirrorPriority(AllSettings.assetPlatformSource.getValue(), mainland = enabledMirror)
-    val mirrorSource = mirrorCurseForgeSearcher.takeIf { enabledMirror }
-    return when (source) {
-        MirrorPriority.OFFICIAL -> listOf(curseForgeSearcher)
-        MirrorPriority.MIRROR_FIRST ->
-            listOfNotNull(mirrorSource, curseForgeSearcher)
-    }
-}
-
-/**
- * 镜像源只能在中国地区使用
- */
-fun mirroredModrinthSource(
-    enabledMirror: Boolean = isChinaMainland()
-): List<ModrinthSearcher> {
-    val source = resolveMirrorPriority(AllSettings.assetPlatformSource.getValue(), mainland = enabledMirror)
-    val mirrorSource = mirrorModrinthSearcher.takeIf { enabledMirror }
-    return when (source) {
-        MirrorPriority.OFFICIAL -> listOf(modrinthSearcher)
-        MirrorPriority.MIRROR_FIRST ->
-            listOfNotNull(mirrorSource, modrinthSearcher)
-    }
-}
 
 suspend fun searchAssets(
     searchPlatform: Platform,
@@ -283,26 +210,6 @@ suspend fun <E> getProject(
     )
 }
 
-suspend fun getProjectByVersion(
-    projectId: String,
-    platform: Platform,
-    printLog: Boolean = true
-): PlatformProject = withContext(Dispatchers.IO) {
-    when (platform) {
-        Platform.MODRINTH -> mirroredPlatformSearcher(
-            searchers = mirroredModrinthSource(),
-            printLog = printLog
-        ) { searcher ->
-            searcher.getProject(projectId)
-        }
-        Platform.CURSEFORGE -> mirroredPlatformSearcher(
-            searchers = mirroredCurseForgeSource(),
-            printLog = printLog
-        ) { searcher ->
-            searcher.getProject(projectId)
-        }
-    }
-}
 
 /**
  * 获取指定平台上的单个版本
@@ -324,56 +231,7 @@ suspend fun getVersionById(
     }
 }
 
-suspend fun getVersionByLocalFile(file: File, sha1: String): PlatformVersion? = withContext(Dispatchers.IO) {
-    coroutineScope {
-        val modrinthDeferred = async(Dispatchers.IO) {
-            runCatching {
-                mirroredPlatformSearcher(
-                    searchers = mirroredModrinthSource(),
-                    printLog = false
-                ) { searcher ->
-                    searcher.getVersionByLocalFile(file, sha1)
-                }
-            }.getOrNull()
-        }
 
-        val curseForgeDeferred = async(Dispatchers.IO) {
-            runCatching {
-                mirroredPlatformSearcher(
-                    searchers = mirroredCurseForgeSource(),
-                    printLog = false
-                ) { searcher ->
-                    searcher.getVersionByLocalFile(file, sha1)
-                }
-            }.getOrNull()
-        }
-
-        val result = select {
-            modrinthDeferred.onAwait { result ->
-                if (result != null) {
-                    curseForgeDeferred.cancel()
-                    result
-                } else {
-                    null
-                }
-            }
-            curseForgeDeferred.onAwait { result ->
-                if (result != null) {
-                    modrinthDeferred.cancel()
-                    result
-                } else {
-                    null
-                }
-            }
-        }
-
-        result ?: run {
-            if (!modrinthDeferred.isCompleted) modrinthDeferred.await()
-            else if (!curseForgeDeferred.isCompleted) curseForgeDeferred.await()
-            else null
-        }
-    }
-}
 
 /** 单次批量指纹匹配的指纹数量上限，防止单次请求数据量过大 */
 const val FINGERPRINT_BATCH_SIZE = 100

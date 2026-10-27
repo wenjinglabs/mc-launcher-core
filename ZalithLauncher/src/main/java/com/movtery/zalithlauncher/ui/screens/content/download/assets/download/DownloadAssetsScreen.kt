@@ -98,7 +98,7 @@ import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.Fa
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.ProjectUrlsContent
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.ScreenshotItemLayout
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.VersionInfoMap
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.initAll
+import com.movtery.zalithlauncher.game.download.assets.platform.initAll
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.mapWithVersions
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState

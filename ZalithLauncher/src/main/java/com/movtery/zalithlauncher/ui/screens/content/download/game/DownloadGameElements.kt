@@ -526,6 +526,7 @@ fun OptiFineVersionSummary(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val forgeVersion: String? = optifine.forgeVersion
             when {
                 optifine.forgeVersion == null -> {
                     Icon(
@@ -538,7 +539,7 @@ fun OptiFineVersionSummary(
                         style = textStyle
                     )
                 }
-                optifine.forgeVersion.isNotEmpty() -> {
+                optifine.forgeVersion?.isNotEmpty() == true -> {
                     Icon(
                         modifier = Modifier.size(iconSize),
                         painter = painterResource(R.drawable.ic_check),

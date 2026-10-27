@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content.download.assets.elements
 
+import com.movtery.zalithlauncher.game.download.assets.platform.composeColor
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -119,30 +120,6 @@ class VersionInfoMap(
     val isAdapt: Boolean
 )
 
-suspend fun <E: PlatformVersion> List<E>.initAllGeneric(
-    currentProjectId: String,
-    also: suspend (E) -> Unit = {}
-): List<E> {
-    return mapNotNull { version ->
-        if (!version.initFile(currentProjectId)) return@mapNotNull null
-        version.also {
-            also(it)
-        }
-    }.sortedByDescending {
-        //排序：最新的版本在前
-        it.platformDatePublished()
-    }
-}
-
-/**
- * 初始化全部版本数据，并筛选出成功初始化的所有版本
- */
-suspend fun List<PlatformVersion>.initAll(
-    currentProjectId: String,
-    also: suspend (PlatformVersion) -> Unit = {}
-): List<PlatformVersion> {
-    return initAllGeneric<PlatformVersion>(currentProjectId, also)
-}
 
 fun List<PlatformVersion>.mapWithVersions(classes: PlatformClasses): List<VersionInfoMap> {
     val grouped = mutableMapOf<Pair<String, PlatformDisplayLabel?>, MutableList<PlatformVersion>>()
@@ -391,13 +368,13 @@ private fun AssetsVersionListItem(
                 .padding(start = 12.dp, end = 8.dp)
                 .size(34.dp)
                 .clip(shape = CircleShape)
-                .background(releaseType.color.copy(alpha = 0.2f)),
+                .background(releaseType.composeColor.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = releaseType.name.take(1),
                 style = MaterialTheme.typography.labelLarge,
-                color = releaseType.color
+                color = releaseType.composeColor
             )
         }
 
@@ -593,11 +570,12 @@ fun ScreenshotItemLayout(
         }
 
         //标题与简介部分
-        if (screenshot.title != null && screenshot.title == screenshot.description) {
+        val screenshotTitle = screenshot.title
+        if (screenshotTitle != null && screenshotTitle == screenshot.description) {
             //标题与简介内容相同，则不需要两个都显示
             //会有作者喜欢把标题与简介设置成一样的内容
             Text(
-                text = screenshot.title,
+                text = screenshotTitle,
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center
             )
