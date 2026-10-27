@@ -19,7 +19,7 @@
 package com.movtery.zalithlauncher.game.multirt
 
 import android.system.Os
-import com.movtery.zalithlauncher.R
+import io.launchcore.core.R
 import com.movtery.zalithlauncher.components.jre.Jre
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.utils.file.child

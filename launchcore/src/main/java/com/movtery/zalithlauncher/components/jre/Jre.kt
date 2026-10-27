@@ -15,28 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
-package com.movtery.zalithlauncher.game.multirt
 
-import com.movtery.zalithlauncher.ZLApplication.Companion.DEVICE_ARCHITECTURE
-import com.movtery.zalithlauncher.utils.device.Architecture.archAsInt
+package com.movtery.zalithlauncher.components.jre
 
-data class Runtime(
-    val name: String,
-    val versionString: String?,
-    val arch: String?,
-    val javaVersion: Int,
-    val isProvidedByLauncher: Boolean,
-    val isJDK8: Boolean
-) {
-    constructor(name: String) : this(
-        name = name,
-        versionString = null,
-        arch = null,
-        javaVersion = 0,
-        isProvidedByLauncher = false,
-        isJDK8 = false
-    )
+import io.launchcore.core.R
 
-    fun isCompatible(): Boolean =
-        versionString != null && DEVICE_ARCHITECTURE == archAsInt(arch)
+enum class Jre(val jreName: String, val jrePath: String, val summary: Int, val majorVersion: Int) {
+    JRE_8("Internal-8", "runtimes/jre-8", R.string.unpack_screen_jre8, 8),
+    JRE_17("Internal-17", "runtimes/jre-17", R.string.unpack_screen_jre17, 17),
+    JRE_21("Internal-21", "runtimes/jre-21", R.string.unpack_screen_jre21, 21),
+    JRE_25("Internal-25", "runtimes/jre-25", R.string.unpack_screen_jre25, 25)
 }

@@ -49,6 +49,13 @@ object Architecture {
         }
     }
 
+    /**
+     * 设备架构缓存值（M1 自 ZLApplication.DEVICE_ARCHITECTURE 收编：首次访问时计算，
+     * 纯框架实现无加载时序问题）。
+     */
+    @get:JvmName("currentDeviceArchitecture")
+    val deviceArchitecture: Int by lazy { getDeviceArchitecture() }
+
     fun isx86Device(): Boolean {
         val ABIs = if (is64BitsDevice) Build.SUPPORTED_64_BIT_ABIS else Build.SUPPORTED_32_BIT_ABIS
         val comparedArch = if (is64BitsDevice) ARCH_X86_64 else ARCH_X86

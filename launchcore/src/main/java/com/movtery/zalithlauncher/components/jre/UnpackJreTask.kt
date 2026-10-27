@@ -20,7 +20,6 @@ package com.movtery.zalithlauncher.components.jre
 
 import android.content.Context
 import android.content.res.AssetManager
-import com.movtery.zalithlauncher.ZLApplication
 import com.movtery.zalithlauncher.components.AbstractUnpackTask
 import com.movtery.zalithlauncher.components.InstallableItem
 import com.movtery.zalithlauncher.game.multirt.RuntimesManager
@@ -88,7 +87,7 @@ class UnpackJreTask(
         }
     }
 
-    private fun getRuntimeByArch() = "bin-" + Architecture.archAsString(ZLApplication.DEVICE_ARCHITECTURE) + ".tar.xz"
+    private fun getRuntimeByArch() = "bin-" + Architecture.archAsString(Architecture.deviceArchitecture) + ".tar.xz"
 
     override suspend fun run() {
         runCatching {
