@@ -18,7 +18,7 @@
 
 package com.movtery.zalithlauncher.game.versioninfo
 
-import com.movtery.zalithlauncher.R
+import io.launchcore.core.R
 import org.jackhuang.hmcl.util.versioning.GameVersionNumber
 
 /**

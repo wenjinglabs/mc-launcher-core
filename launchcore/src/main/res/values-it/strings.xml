@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- M1: strings extracted from ZalithLauncher2 app resources (GPL-3.0) -->
+<resources>
+<string name="download_game_install_base_download_file">Scarica il file principale %1$s %2$s</string>
+<string name="download_game_install_base_download_file2">Scarica il file principale %s</string>
+<string name="download_game_install_base_install">Installa %s</string>
+<string name="download_game_install_base_installing">Installazione %s in primo piano</string>
+<string name="download_game_install_forgelike_analyse">Analizzazione librerie per %s</string>
+<string name="download_game_install_forgelike_preparing_mapping_file">Preparazione file di mapping %s</string>
+<string name="download_game_install_game_files_progress">Installa file di gioco</string>
+<string name="download_game_install_optifine_fetch_download_url">Prendendo l\'URL di download per OptiFine %s</string>
+<string name="download_game_install_vanilla">Scaricamento Vanilla %s</string>
+<string name="error_connection_failed">Impossibile connetterti al server</string>
+<string name="error_network_unreachable">Internet non disponibile</string>
+<string name="error_timeout">Richiesta scaduta</string>
+<string name="generic_confirm">Conferma</string>
+<string name="generic_disable">Disabilita</string>
+<string name="generic_done">Fatto</string>
+<string name="generic_enable">Abilita</string>
+<string name="generic_error">Errore</string>
+<string name="generic_follow_global">Segui le impostazioni globali</string>
+<string name="generic_unpacking">Unpacking di %s</string>
+<string name="main_launch_game">Avvia</string>
+<string name="notification_data_jvm_service_running">Installazione gioco via servizio in primo piano</string>
+<string name="unpack_screen_authlib_injector">Modifica authlib per gli accessi esterni</string>
+<string name="unpack_screen_cacio">Backend GUI portatile per OpenJDK</string>
+<string name="unpack_screen_jre17">Environment Java 17 (richiesto per Minecraft 1.17+)</string>
+<string name="unpack_screen_jre21">Environment Java 21 (richiesto per Minecraft 1.20.5+)</string>
+<string name="unpack_screen_jre8">Environment Java 8 (richiesto per Minecraft 1.16 e prima)</string>
+<string name="unpack_screen_launcher">Componenti launcher essenziali</string>
+<string name="unpack_screen_lwjgl">Libreria di Giocho Java Leggera (richiesto da Minecraft)</string>
+</resources>

@@ -42,7 +42,7 @@ MinecraftSurface(handle)   // 来自可选 compose 构件
 - [x] **M0**（本阶段）：硬 fork 2.7.2、`:launchcore` 模块 + API 草案、纯净度门禁、PROJECT.md
 - [ ] **M1**：边界重构——按包映射搬家、解开 Compose/Toast/Activity 依赖、门禁脚本持续绿灯（本地执行）。交付：App 功能不变，core 无 Android UI 依赖
 - [ ] **M2**：对外 0.1（JitPack）——`MinecraftSurface` + 组件库第一组（安装进度/账号登录/启动按钮/崩溃面板）、sample 离线启动 arm64（≈30 行）、get-started 文档
-- [ ] **M3**：0.2——runtime packs 按需下载上线（AAR 瘦身达标）、微软登录、渲染器切换
+- [ ] **M3**：0.2——runtime packs 按需下载上线（AAR 瘦身达标）、渲染器切换。**微软登录延后**（2026-10-27 维护者决策：当前只做离线模式；API 契约已就绪——`LaunchCoreConfig.microsoftClientId` + `Auth.microsoft` 抛 IllegalStateException，实现在延后期间保持抛错即可）
 - [ ] **M4**：1.0——mod loader 安装、reference-app 验收、迁 Maven Central、锁 API
 
 ## 架构决策（ADR）

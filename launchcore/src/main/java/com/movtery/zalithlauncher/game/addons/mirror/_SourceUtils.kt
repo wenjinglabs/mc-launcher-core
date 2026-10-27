@@ -18,12 +18,12 @@
 
 package com.movtery.zalithlauncher.game.addons.mirror
 
-import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.game.GameConfig
 import com.movtery.zalithlauncher.utils.logging.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import kotlinx.io.IOException
+import java.io.IOException
 
 private const val TAG = "SourceUtils"
 
@@ -67,7 +67,7 @@ suspend fun <T> runMirrorable(
  * 自动档下大陆用户镜像优先，官方档仅保留官方源
  */
 fun <T> List<MirrorSource<T>>.orderedByGameSourcePreference(): List<MirrorSource<T>> =
-    when (resolveMirrorPriority(AllSettings.gameDownloadSource.getValue(), mainland = true)) {
+    when (resolveMirrorPriority(GameConfig.gameDownloadSource(), mainland = true)) {
         MirrorPriority.OFFICIAL -> filter { it.type == SourceType.OFFICIAL }
         MirrorPriority.MIRROR_FIRST -> reversed()
     }

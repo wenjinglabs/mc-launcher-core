@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- M1: strings extracted from ZalithLauncher2 app resources (GPL-3.0) -->
+<resources>
+<string name="generic_confirm">جەزىملەشتۈرۈش</string>
+<string name="generic_disable">چەكلەش</string>
+<string name="generic_done">ئورۇنلىاندى</string>
+<string name="generic_enable">قوزغىتىش</string>
+<string name="generic_error">خاتا</string>
+<string name="generic_follow_global">پۈتۈن ئەگىشىش</string>
+<string name="generic_unpacking">ھازىر بېسىمنى تۆۋەنلىتىۋاتىدۇ%s</string>
+</resources>
